@@ -24,13 +24,13 @@ public class BoolScript {
 
     public static final Parser<Boolean> negate = isChar('!').then(boolExpression).map(r -> !r);
 
-    public static final Parser<Boolean> bracket = isChar('(').then(boolExpression).skip(isChar(')'));
+    public static final Parser<Boolean> bracketExpression = isChar('(').then(boolExpression).skip(isChar(')'));
 
     public static final Parser<Boolean> trueAndExpression = string("true&&").then(boolExpression);
 
     public static final Parser<Boolean> falseOrExpression = string("false||").then(boolExpression);
 
-    public static final Parser<Boolean> boolScript = or(negate, bracket, trueAndExpression, falseOrExpression, isTrue, isFalse);
+    public static final Parser<Boolean> boolScript = or(negate, bracketExpression, trueAndExpression, falseOrExpression, isTrue, isFalse);
 
     private static Parser<Boolean> boolExpression() {
         return boolScript;
