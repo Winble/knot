@@ -5,6 +5,8 @@ import org.winble.knot.parsec.type.ParseResult;
 import org.winble.knot.parsec.type.Parser;
 
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static org.winble.knot.parsec.Combinators.*;
 import static org.winble.knot.parsec.util.ParserUtils.*;
@@ -25,6 +27,14 @@ public class Parsers {
 
     public static Parser<Character> next() {
         return satisfy(ignore -> true);
+    }
+
+    public static <V> Parser<V> equal(Supplier<V> supplier) {
+        return input -> ParseResult.success(supplier.get(), input);
+    }
+
+    public static <V> Parser<V> equal(V value) {
+        return equal(() -> value);
     }
 
     public static Parser<String> string(String str) {
