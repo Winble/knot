@@ -9,7 +9,7 @@ import static org.winble.knot.parsec.Parsers.*;
 /**
  * @author bowenzhang
  * Create on 2022/12/29
- * {true | false | !}
+ * {true | false}
  * S ::= true && S | false || S | T | F | !S | (S)
  * T ::= true || S | true | !false
  * F ::= false && S | false | !true
