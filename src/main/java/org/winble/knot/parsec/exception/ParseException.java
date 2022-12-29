@@ -11,4 +11,11 @@ public class ParseException extends RuntimeException {
     public ParseException(String input) {
         this.input = input;
     }
+
+    @Override
+    public String toString() {
+        return "ParseException{" +
+                "input='" + input + '\'' +
+                '}';
+    }
 }

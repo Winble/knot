@@ -1,6 +1,9 @@
 package org.winble.knot.parsec.type;
 
+import org.winble.knot.parsec.Parsers;
 import org.winble.knot.parsec.exception.ParseException;
+
+import java.util.function.Function;
 
 /**
  * @author bowenzhang
@@ -27,12 +30,16 @@ public class ParseResult<R> {
         return new ParseResult<>(null, null, error);
     }
 
-    public static <R> ParseResult<R> succeed(R result, String remain) {
+    public static <R> ParseResult<R> success(R result, String remain) {
         return new ParseResult<>(result, remain, null);
     }
 
     public boolean isSuccess() {
         return null == error;
+    }
+
+    public <V> ParseResult<V> ifSuccess(Function<ParseResult<R>, ParseResult<V>> mapper) {
+        return isSuccess() ? mapper.apply(this) : failure(this.getError());
     }
 
     public R getResult() {

@@ -12,4 +12,11 @@ public class UnexpectedException extends ParseException {
         super(input);
         this.o = o;
     }
+
+    @Override
+    public String toString() {
+        return "UnexpectedException{" +
+                "o=" + o +
+                "} " + super.toString();
+    }
 }

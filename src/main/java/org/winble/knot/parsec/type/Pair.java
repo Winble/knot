@@ -10,7 +10,7 @@ public class Pair<L, R> {
 
     private R right;
 
-    public static <L, R> Pair<L, R> from(L left, R right) {
+    public static <L, R> Pair<L, R> of(L left, R right) {
         Pair<L, R> pair = new Pair<>();
         pair.left = left;
         pair.right = right;

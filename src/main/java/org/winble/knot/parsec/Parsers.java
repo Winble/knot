@@ -1,9 +1,13 @@
 package org.winble.knot.parsec;
 
+import org.winble.knot.parsec.exception.UnexpectedException;
 import org.winble.knot.parsec.type.ParseResult;
 import org.winble.knot.parsec.type.Parser;
 
+import java.util.List;
+
 import static org.winble.knot.parsec.Combinators.*;
+import static org.winble.knot.parsec.util.ParserUtils.*;
 
 /**
  * @author bowenzhang
@@ -19,8 +23,20 @@ public class Parsers {
         return satisfy(ch -> c != ch);
     }
 
+    public static Parser<Character> next() {
+        return satisfy(ignore -> true);
+    }
+
+    public static Parser<String> string(String str) {
+        return isEnd(str) ? input -> ParseResult.success(str, input) : isChar(str.charAt(0)).then(defer(() -> string(str.substring(1))));
+    }
+
+    public static <R> Parser<R> fail() {
+        return input -> ParseResult.failure(new UnexpectedException(input, input));
+    }
+
     public static void main(String[] args) {
-        ParseResult<Character> result = or(Parsers.isChar('a'), Parsers.isChar('b'), Parsers.isChar('c')).parse("bca");
+        ParseResult<List<String>> result = many(string("123")).parse("123123456");
         System.out.println(result);
     }
 }
