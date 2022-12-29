@@ -44,9 +44,4 @@ public class Parsers {
     public static <R> Parser<R> fail() {
         return input -> ParseResult.failure(new UnexpectedException(input, input));
     }
-
-    public static void main(String[] args) {
-        ParseResult<List<String>> result = many(string("123")).parse("123123456");
-        System.out.println(result);
-    }
 }
