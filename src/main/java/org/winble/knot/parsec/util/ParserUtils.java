@@ -1,6 +1,10 @@
 package org.winble.knot.parsec.util;
 
+import org.winble.knot.parsec.type.Pair;
+
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -10,7 +14,7 @@ import java.util.stream.Collectors;
 public class ParserUtils {
 
     public static boolean isEnd(String input) {
-        return null == input || input.length() == 0 || input.trim().isEmpty();
+        return null == input || input.length() == 0;
     }
 
     @SafeVarargs
@@ -25,5 +29,13 @@ public class ParserUtils {
 
     public static <T> List<T> merge(T v, Collection<T> vs) {
         return merge(Collections.singleton(v), vs);
+    }
+
+    public static <L, R, T> Function<Pair<L, R>, T> invoke(BiFunction<L, R, T> func) {
+        return pair -> func.apply(pair.getLeft(), pair.getRight());
+    }
+
+    public static String charsToString(Collection<Character> chs) {
+        return chs.isEmpty() ? "" : chs.stream().map(String::valueOf).collect(Collectors.joining());
     }
 }

@@ -14,35 +14,35 @@ import static org.winble.knot.parsec.Parsers.*;
  * T ::= true || S | true
  * F ::= false && S | false
  * T ::= !F
+ * F ::= !T
  */
 public class BoolScript {
 
-    public static final Parser<Boolean> boolExpression = defer(BoolScript::boolExpression);
+    public static final Parser<?> ignoreSpace = isChar(' ').skipMany();
 
-    public static final Parser<Boolean> trueExpression = string("true||").skip(boolExpression).or(string("true")).map(true);
+    public static final Parser<Boolean> boolExpression = defer(() -> BoolScript.script.wrap(ignoreSpace));
 
-    public static final Parser<Boolean> falseExpression = string("false&&").skip(boolExpression).or(string("false")).map(false);
+    public static final Parser<Boolean> trueExpression = string("true").then(string("||").wrap(ignoreSpace)).skip(boolExpression).or(string("true")).as(true);
+
+    public static final Parser<Boolean> falseExpression = string("false").then(string("&&").wrap(ignoreSpace)).skip(boolExpression).or(string("false")).as(false);
 
     public static final Parser<Boolean> negateExpression = isChar('!').then(boolExpression).map(r -> !r);
 
     public static final Parser<Boolean> bracketExpression = isChar('(').then(boolExpression).skip(isChar(')'));
 
-    public static final Parser<Boolean> andExpression = trueExpression.skip(string("&&")).bind(r -> r ? boolExpression : boolExpression.map(false));
-//
-    public static final Parser<Boolean> orExpression = falseExpression.skip(string("||")).bind(r -> r ? boolExpression.map(true) : boolExpression);
+    public static final Parser<Boolean> andExpression = trueExpression.skip(string("&&").wrap(ignoreSpace)).bind(r -> r ? boolExpression : boolExpression.as(false));
 
-    public static final Parser<Boolean> boolScript = or(negateExpression, bracketExpression, andExpression, orExpression, trueExpression, falseExpression);
+    public static final Parser<Boolean> orExpression = falseExpression.skip(string("||").wrap(ignoreSpace)).bind(r -> r ? boolExpression.as(true) : boolExpression);
 
-    private static Parser<Boolean> boolExpression() {
-        return boolScript;
-    }
+    public static final Parser<Boolean> script = or(negateExpression, bracketExpression, andExpression, orExpression, trueExpression, falseExpression);
 
     public static boolean eval(String expression) {
-        expression = expression.replaceAll(" ", "");
-        ParseResult<Boolean> result = boolScript.parse(expression);
-        if (!result.isSuccess()) {
-            throw result.getError();
-        }
-        return result.getResult();
+        expression = expression.trim();
+        return script.parse(expression).get();
+    }
+
+    public static void main(String[] args) {
+        ParseResult<String> result = string("true").wrap(ignoreSpace).parse(" true    ");
+        System.out.println(result);
     }
 }

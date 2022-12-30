@@ -2,6 +2,7 @@ package org.winble.knot.parsec;
 
 import org.winble.knot.parsec.exception.EndOfInputException;
 import org.winble.knot.parsec.exception.UnexpectedException;
+import org.winble.knot.parsec.type.Pair;
 import org.winble.knot.parsec.type.ParseResult;
 import org.winble.knot.parsec.type.Parser;
 
@@ -31,10 +32,7 @@ public class Combinators {
     }
 
     public static <R1, R2> Parser<R2> bind(Parser<R1> p, Function<R1, Parser<R2>> flatMap) {
-        return input -> {
-            ParseResult<R1> r1 = p.parse(input);
-            return r1.isSuccess() ? flatMap.apply(r1.getResult()).parse(r1.getRemain()) : ParseResult.failure(r1.getError());
-        };
+        return input -> p.parse(input).ifSuccess(r -> flatMap.apply(r.getResult()).parse(r.getRemain()));
     }
 
     public static <R1, R2> Parser<R2> map(Parser<R1> p, Function<R1, R2> mapper) {
@@ -46,7 +44,15 @@ public class Combinators {
     }
 
     public static <R> Parser<R> skip(Parser<R> p1, Parser<?> p2) {
-        return bind(p1, r1 -> input -> p2.parse(input).ifSuccess(r2 -> ParseResult.success(r1, r2.getRemain())));
+        return p1.bind(p2::as);
+    }
+
+    public static <R> Parser<R> skipMany(Parser<R> p1, Parser<?> p2) {
+        return p1.bind(p2.many()::as);
+    }
+
+    public static <R> Parser<R> skipMany(Parser<R> p) {
+        return skipMany(input -> ParseResult.success(null, input), p);
     }
 
     public static <R> Parser<R> or(Parser<R> left, Parser<R> right) {
@@ -59,6 +65,14 @@ public class Combinators {
     @SafeVarargs
     public static <R> Parser<R> or(Parser<R> p1, Parser<R> p2, Parser<R>... ps) {
         return Arrays.stream(ps).reduce(p1.or(p2), Combinators::or);
+    }
+
+    public static <R> Parser<R> and(Parser<R> p1, Parser<R> p2) {
+        return input -> p1.parse(input).ifSuccess(r -> p2.parse(input));
+    }
+
+    public static <R1, R2> Parser<Pair<R1, R2>> union(Parser<R1> p1, Parser<R2> p2) {
+        return p1.bind(r1 -> p2.map(r2 -> Pair.of(r1, r2)));
     }
 
     public static <R> Parser<R> defer(Supplier<Parser<R>> supplier) {
@@ -81,7 +95,15 @@ public class Combinators {
         };
     }
 
-    public static <R> Parser<List<R>> until(Parser<R> p, Predicate<String> peek) {
-        return either(peek, p, Parsers.fail()).many();
+    public static <R> Parser<List<R>> until(Parser<R> p, Parser<?> peek) {
+        return either(input -> !peek.parse(input).isSuccess(), p, Parsers.fail()).many();
+    }
+
+    public static <R> Parser<List<R>> when(Parser<R> p, Parser<?> peek) {
+        return either(input -> peek.parse(input).isSuccess(), p, Parsers.fail()).many();
+    }
+
+    public static <R1> Parser<R1> wrap(Parser<R1> p1, Parser<?> p2) {
+        return p2.then(p1).skip(p2);
     }
 }

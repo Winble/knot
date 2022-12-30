@@ -54,6 +54,13 @@ public class ParseResult<R> {
         return error;
     }
 
+    public R get() {
+        if (!isSuccess()) {
+            throw error;
+        }
+        return result;
+    }
+
     @Override
     public String toString() {
         return "ParseResult{" +
