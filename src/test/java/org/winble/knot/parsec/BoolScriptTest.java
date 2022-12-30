@@ -26,6 +26,7 @@ public class BoolScriptTest {
         assertFalse(eval("false || false"));
         assertFalse(eval("false && true && false"));
         assertFalse(eval("!true || false"));
+        assertFalse(eval("true && true && false"));
 
         assertTrue(eval("false || !(true && false)"));
         assertTrue(eval("true && (false || true)  "));

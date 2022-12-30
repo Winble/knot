@@ -16,9 +16,10 @@ public class DataRuleScriptTest {
     @Test
     public void testExpression() {
         assertTrue(eval("[\"123\",\"t\"].contains(\"t\")"));
-        assertTrue(eval("\"abcd\"==\"abcd\""));
+        assertTrue(eval("\"abcd\" == \"abcd\""));
         assertTrue(eval("true && \"abcd\" == \"abcd\" && [\"123\",\"t\"].contains(\"t\")"));
 
+        assertFalse(eval("[\"123\",\"t\"].contains(\"b\")"));
         assertFalse(eval("true && \"abc\" == \"abcd\" && [\"123\",\"t\"].contains(\"t\")"));
         assertFalse(eval("true && \"abcd\" == \"abcd\" && [\"123\",\"t\"].contains(\"b\")"));
     }
