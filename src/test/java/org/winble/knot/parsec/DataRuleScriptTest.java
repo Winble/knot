@@ -20,6 +20,6 @@ public class DataRuleScriptTest {
         assertTrue(eval("true && \"abcd\" == \"abcd\" && [\"123\",\"t\"].contains(\"t\")"));
 
         assertFalse(eval("true && \"abc\" == \"abcd\" && [\"123\",\"t\"].contains(\"t\")"));
-        assertFalse(eval("true && \"abc\" == \"abcd\" && [\"123\",\"t\"].contains(\"b\")"));
+        assertFalse(eval("true && \"abcd\" == \"abcd\" && [\"123\",\"t\"].contains(\"b\")"));
     }
 }
