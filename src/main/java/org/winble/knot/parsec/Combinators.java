@@ -5,10 +5,12 @@ import org.winble.knot.parsec.exception.UnexpectedException;
 import org.winble.knot.parsec.type.Pair;
 import org.winble.knot.parsec.type.ParseResult;
 import org.winble.knot.parsec.type.Parser;
+import org.winble.knot.parsec.util.ParserUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -23,7 +25,7 @@ public class Combinators {
 
     public static Parser<Character> satisfy(Predicate<Character> predicate) {
         return input -> {
-            if (isEnd(input)) {
+            if (isEnded(input)) {
                 return ParseResult.failure(new EndOfInputException(input));
             }
             char c = input.charAt(0);
@@ -55,10 +57,10 @@ public class Combinators {
         return skipMany(input -> ParseResult.success(null, input), p);
     }
 
-    public static <R> Parser<R> or(Parser<R> left, Parser<R> right) {
+    public static <R> Parser<R> or(Parser<R> p1, Parser<R> p2) {
         return input -> {
-            ParseResult<R> r = left.parse(input);
-            return r.isSuccess() ? r : right.parse(input);
+            ParseResult<R> r = p1.parse(input);
+            return r.isSuccess() ? r : p2.parse(input);
         };
     }
 
@@ -115,6 +117,26 @@ public class Combinators {
             } else {
                 return ParseResult.success(null, input);
             }
+        };
+    }
+
+    public static <R> Parser<List<R>> only(Parser<R> p) {
+        return input -> {
+            ParseResult<R> r = p.parse(input);
+            if (r.isSuccess()) {
+                return only(p).parse(r.getRemain()).ifSuccess(rs -> ParseResult.success(merge(r.getResult(), rs.getResult()), rs.getRemain()));
+            } else if (r.getError() instanceof EndOfInputException) {
+                return ParseResult.success(new ArrayList<>(0), input);
+            } else {
+                return ParseResult.failure(new UnexpectedException(input, input));
+            }
+        };
+    }
+
+    public static <R> Parser<R> ended(Parser<R> p) {
+        return input -> {
+            ParseResult<R> r = p.parse(input);
+            return isEnded(r.getRemain()) ? r : ParseResult.failure(new UnexpectedException(r.getRemain(), r.getRemain()));
         };
     }
 }

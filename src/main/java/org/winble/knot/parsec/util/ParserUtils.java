@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  */
 public class ParserUtils {
 
-    public static boolean isEnd(String input) {
+    public static boolean isEnded(String input) {
         return null == input || input.length() == 0;
     }
 

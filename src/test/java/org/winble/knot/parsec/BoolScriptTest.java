@@ -1,6 +1,8 @@
 package org.winble.knot.parsec;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
+import org.winble.knot.parsec.exception.UnexpectedException;
 
 import static org.winble.knot.parsec.BoolScript.eval;
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,5 +32,6 @@ public class BoolScriptTest {
 
         assertTrue(eval("false || !(true && false)"));
         assertTrue(eval("true && (false || true)  "));
+        assertThrows(UnexpectedException.class, () -> eval("true && (false || true)  any  "));
     }
 }

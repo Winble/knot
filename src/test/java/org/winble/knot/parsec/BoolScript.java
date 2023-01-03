@@ -21,7 +21,7 @@ public class BoolScript {
 
     public static final Parser<?> ignoreSpace = isChar(' ').skipMany();
 
-    public static final Parser<Boolean> boolExpression = defer(() -> BoolScript.script.wrap(ignoreSpace));
+    public static final Parser<Boolean> boolExpression = defer(() -> BoolScript.script);
 
     public static final Parser<Predicate<Boolean>> predicateExpression = defer(() -> BoolScript.predicate.wrap(ignoreSpace));
 
@@ -39,10 +39,9 @@ public class BoolScript {
 
     public static final Parser<Boolean> evaluateExpression = or(string("true").as(true), string("false").as(false)).wrap(ignoreSpace);
 
-    public static final Parser<Boolean> script = or(bracketExpression, negateExpression, evaluateExpression.bind(pre -> predicateExpression.map(r -> r.test(pre))));
+    public static final Parser<Boolean> script = or(bracketExpression, negateExpression, evaluateExpression.bind(pre -> predicateExpression.map(r -> r.test(pre)))).wrap(ignoreSpace);
 
     public static boolean eval(String expression) {
-        expression = expression.trim();
-        return script.parse(expression).get();
+        return script.ended().parse(expression).get();
     }
 }

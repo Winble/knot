@@ -1,7 +1,9 @@
 package org.winble.knot.parsec.type;
 
 import org.winble.knot.parsec.Parsers;
+import org.winble.knot.parsec.exception.EndOfInputException;
 import org.winble.knot.parsec.exception.ParseException;
+import org.winble.knot.parsec.util.ParserUtils;
 
 import java.util.function.Function;
 
@@ -40,6 +42,14 @@ public class ParseResult<R> {
 
     public <V> ParseResult<V> ifSuccess(Function<ParseResult<R>, ParseResult<V>> mapper) {
         return isSuccess() ? mapper.apply(this) : failure(this.getError());
+    }
+
+    public ParseResult<R> ifFailure(Function<ParseResult<R>, ParseResult<R>> orElse) {
+        return isSuccess() ? this : orElse.apply(this);
+    }
+
+    public ParseResult<R> ifEnded(R r) {
+        return error instanceof EndOfInputException || ParserUtils.isEnded(remain) ? success(r, null) : this;
     }
 
     public R getResult() {

@@ -79,4 +79,8 @@ public interface Parser<R> {
     default Parser<R> wrap(Parser<?> p) {
         return Combinators.wrap(this, p);
     }
+
+    default Parser<R> ended() {
+        return Combinators.ended(this);
+    }
 }

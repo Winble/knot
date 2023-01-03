@@ -2,10 +2,9 @@ package org.winble.knot.parsec;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.winble.knot.parsec.DataRuleScript.eval;
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author bowenzhang
