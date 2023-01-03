@@ -4,6 +4,7 @@ import org.winble.knot.parsec.type.ParseResult;
 import org.winble.knot.parsec.type.Parser;
 import org.winble.knot.parsec.util.ParserUtils;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.function.Predicate;
 import static org.winble.knot.parsec.Combinators.defer;
 import static org.winble.knot.parsec.Combinators.or;
 import static org.winble.knot.parsec.Parsers.*;
-import static org.winble.knot.parsec.util.ParserUtils.invoke;
+import static org.winble.knot.parsec.util.ParserUtils.biInvoke;
 
 /**
  * @author bowenzhang
@@ -59,15 +60,19 @@ public class DataRuleScript {
 
     public static final Parser<Object> valueExtractor = or(stringExtractor.convert(), listExtractor.convert()).wrap(ignoreSpace);
 
-    public static final Parser<Boolean> equalExpression = valueExtractor.skip(string("==")).union(valueExtractor).map(invoke(DataRuleScript::equalEval));
+    public static final Parser<Boolean> equalExpression = valueExtractor.skip(string("==")).union(valueExtractor).map(biInvoke(DataRuleScript::equalEval));
 
-    public static final Parser<Boolean> containsOneExpression = listExtractor.skip(string(".contains(")).union(valueExtractor).skip(isChar(')')).map(invoke(DataRuleScript::containsEval));
+    public static final Parser<Boolean> containsOneExpression = listExtractor.skip(string(".contains(")).union(valueExtractor).skip(isChar(')')).map(biInvoke(DataRuleScript::containsEval));
 
-    public static final Parser<Boolean> containsAllExpression = listExtractor.skip(string(".containsAll(")).union(listExtractor).skip(isChar(')')).map(invoke(DataRuleScript::containsAllEval));
+    public static final Parser<Boolean> containsAllExpression = listExtractor.skip(string(".containsAll(")).union(listExtractor).skip(isChar(')')).map(biInvoke(DataRuleScript::containsAllEval));
 
     public static final Parser<Boolean> containsExpression = or(containsOneExpression, containsAllExpression);
 
-    public static final Parser<Boolean> evaluateExpression = or(equalExpression, containsExpression, string("true").as(true), string("false").as(false)).wrap(ignoreSpace);
+    public static final Parser<Boolean> isEmptyExpression = listExtractor.skip(string(".isEmpty()")).map(DataRuleScript::isEmptyEval);
+
+    public static final Parser<Boolean> instanceOfExpression = valueExtractor.skip(string("instanceof")).skipMany(isChar(' ')).union(next().until(isChar(' ')).map(ParserUtils::charsToString)).map(biInvoke(DataRuleScript::instanceOfEval));
+
+    public static final Parser<Boolean> evaluateExpression = or(equalExpression, containsExpression, isEmptyExpression, instanceOfExpression, string("true").as(true), string("false").as(false)).wrap(ignoreSpace);
 
     public static final Parser<Boolean> script = or(bracketExpression, negateExpression, evaluateExpression.bind(pre -> predicateExpression.map(r -> r.test(pre)))).wrap(ignoreSpace);
 
@@ -113,6 +118,13 @@ public class DataRuleScript {
 
     private static boolean isEmptyEval(Collection<?> vs) {
         return null == vs || vs.isEmpty();
+    }
+
+    public static boolean instanceOfEval(Object v, String className) {
+        if (className.equals("List")) {
+            return v instanceof List;
+        }
+        return false;
     }
 
     public static boolean eval(String expression) {

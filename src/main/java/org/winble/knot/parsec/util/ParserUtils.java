@@ -31,7 +31,7 @@ public class ParserUtils {
         return merge(Collections.singleton(v), vs);
     }
 
-    public static <L, R, T> Function<Pair<L, R>, T> invoke(BiFunction<L, R, T> func) {
+    public static <L, R, T> Function<Pair<L, R>, T> biInvoke(BiFunction<L, R, T> func) {
         return pair -> func.apply(pair.getLeft(), pair.getRight());
     }
 

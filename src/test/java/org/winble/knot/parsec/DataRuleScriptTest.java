@@ -17,9 +17,13 @@ public class DataRuleScriptTest {
         assertTrue(eval("[\"123\",\"t\"].contains(\"t\")"));
         assertTrue(eval("\"abcd\" == \"abcd\""));
         assertTrue(eval("true && \"abcd\" == \"abcd\" && [\"123\",\"t\"].contains(\"t\")"));
+        assertTrue(eval("true ? true : false"));
 
+        assertFalse(eval("false ? true : false"));
         assertFalse(eval("[\"123\",\"t\"].contains(\"b\")"));
         assertFalse(eval("true && \"abc\" == \"abcd\" && [\"123\",\"t\"].contains(\"t\")"));
         assertFalse(eval("true && \"abcd\" == \"abcd\" && [\"123\",\"t\"].contains(\"b\")"));
+
+        assertTrue(eval("[\"123\",\"t\"] instanceof List ? \"abcd\" == \"abcd\" : [\"123\",\"t\"].contains(\"b\")"));
     }
 }
