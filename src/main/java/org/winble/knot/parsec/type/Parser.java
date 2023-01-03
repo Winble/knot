@@ -4,7 +4,6 @@ import org.winble.knot.parsec.Combinators;
 import org.winble.knot.parsec.Parsers;
 
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -45,7 +44,7 @@ public interface Parser<R> {
     }
 
     @SuppressWarnings("unchecked")
-    default <V> Parser<V> map() {
+    default <V> Parser<V> convert() {
         return Combinators.map(this, r -> (V) r);
     }
 

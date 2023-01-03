@@ -35,4 +35,8 @@ public class Parsers {
     public static <R> Parser<R> fail() {
         return input -> ParseResult.failure(new UnexpectedException(input, input));
     }
+
+    public static <R> Parser<R> as(R r) {
+        return input -> ParseResult.success(r, input);
+    }
 }

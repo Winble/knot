@@ -106,4 +106,15 @@ public class Combinators {
     public static <R1> Parser<R1> wrap(Parser<R1> p1, Parser<?> p2) {
         return p2.then(p1).skip(p2);
     }
+
+    public static <R> Parser<R> optional(Parser<R> p) {
+        return input -> {
+            ParseResult<R> result = p.parse(input);
+            if (result.isSuccess()) {
+                return result;
+            } else {
+                return ParseResult.success(null, input);
+            }
+        };
+    }
 }
