@@ -1,10 +1,8 @@
 package org.winble.knot.parsec;
 
-import org.winble.knot.parsec.type.ParseResult;
 import org.winble.knot.parsec.type.Parser;
 import org.winble.knot.parsec.util.ParserUtils;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
