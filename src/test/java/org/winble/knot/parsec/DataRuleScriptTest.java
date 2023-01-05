@@ -22,7 +22,7 @@ public class DataRuleScriptTest {
         assertTrue(eval("true && \"abcd\" == \"abcd\" && [\"123\",\"t\"].contains(\"t\")"));
         assertTrue(eval("true ? true : false"));
         assertTrue(eval("[\"123\",\"t\"].containsAll([\"t\"])"));
-        assertTrue(eval("\"a\" == \"b\" || ([\"123\",\"t\"].containsAll([\"t\"]) && true)"));
+        assertTrue(eval("\"a\" == \"b\" || (![\"123\",\"t\"].containsAll([\"b\"]) && true)"));
 
         assertFalse(eval("false ? true : false"));
         assertFalse(eval("[\"123\",\"t\"].contains(\"b\")"));
@@ -40,7 +40,7 @@ public class DataRuleScriptTest {
         GroovyShell groovyShell = new GroovyShell();
         Function<String, Object> groovy = loop(groovyWatch, groovyShell::evaluate, 1000);
         assertFuncEquals(knot, groovy, "[\"123\",\"t\"].contains(\"t\")");
-        assertFuncEquals(knot, groovy, "\"a\" == \"b\" || ([\"123\",\"t\"].containsAll([\"t\"]) && true)");
+        assertFuncEquals(knot, groovy, "\"a\" == \"b\" || (![\"123\",\"t\"].containsAll([\"t\"]) && true)");
         assertFuncEquals(knot, groovy, "[\"123\",\"t\"] instanceof List ? \"abcd\" == \"abcd\" : [\"123\",\"t\"].contains(\"b\")");
         System.out.println(knotWatch.prettyPrint());
         System.out.println(groovyWatch.prettyPrint());
