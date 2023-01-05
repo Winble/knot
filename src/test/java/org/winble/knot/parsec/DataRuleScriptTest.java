@@ -34,22 +34,22 @@ public class DataRuleScriptTest {
     @Test
     public void testPerformance() {
         StopWatch knotWatch = new StopWatch("Knot");
-        Function<String, Object> knot = loop(knotWatch, DataRuleScript::eval);
+        Function<String, Object> knot = loop(knotWatch, DataRuleScript::eval, 10000);
         StopWatch groovyWatch = new StopWatch("Groovy");
         GroovyShell groovyShell = new GroovyShell();
-        Function<String, Object> groovy = loop(groovyWatch, groovyShell::evaluate);
+        Function<String, Object> groovy = loop(groovyWatch, groovyShell::evaluate, 10000);
         assertFuncEquals(knot, groovy, "[\"123\",\"t\"].contains(\"t\")");
-        assertFuncEquals(knot, groovy, "false ? true : false");
+        assertFuncEquals(knot, groovy, "\"a\" == \"b\" || ([\"123\",\"t\"].contains(\"t\") && true)");
         assertFuncEquals(knot, groovy, "[\"123\",\"t\"] instanceof List ? \"abcd\" == \"abcd\" : [\"123\",\"t\"].contains(\"b\")");
         System.out.println(knotWatch.prettyPrint());
         System.out.println(groovyWatch.prettyPrint());
     }
 
-    private Function<String, Object> loop(StopWatch stopWatch, Function<String, Object> engine) {
+    private Function<String, Object> loop(StopWatch stopWatch, Function<String, Object> engine, int times) {
         return script -> {
             stopWatch.start(script);
             Object r = null;
-            for (int i = 0; i < 1000; i++) {
+            for (int i = 0; i < times; i++) {
                 r = engine.apply(script);
             }
             stopWatch.stop();
