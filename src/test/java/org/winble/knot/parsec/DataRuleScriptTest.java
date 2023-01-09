@@ -46,6 +46,27 @@ public class DataRuleScriptTest {
         System.out.println(groovyWatch.prettyPrint());
     }
 
+    @Test
+    public void testKnotPerformance() {
+        StopWatch knotWatch = new StopWatch("Knot");
+        Function<String, Object> knot = loop(knotWatch, DataRuleScript::eval, 10000);
+        knot.apply("[\"123\",\"t\"].contains(\"t\")");
+        knot.apply("\"a\" == \"b\" || (![\"123\",\"t\"].containsAll([\"b\"]) && true)");
+        knot.apply("[\"123\",\"t\"] instanceof List ? \"abcd\" == \"abcd\" : [\"123\",\"t\"].contains(\"b\")");
+        System.out.println(knotWatch.prettyPrint());
+    }
+
+    @Test
+    public void testGroovyPerformance() {
+        StopWatch groovyWatch = new StopWatch("Groovy");
+        GroovyShell groovyShell = new GroovyShell();
+        Function<String, Object> groovy = loop(groovyWatch, groovyShell::evaluate, 10000);
+        groovy.apply("[\"123\",\"t\"].contains(\"t\")");
+        groovy.apply("\"a\" == \"b\" || (![\"123\",\"t\"].containsAll([\"b\"]) && true)");
+        groovy.apply("[\"123\",\"t\"] instanceof List ? \"abcd\" == \"abcd\" : [\"123\",\"t\"].contains(\"b\")");
+        System.out.println(groovyWatch.prettyPrint());
+    }
+
     private Function<String, Object> loop(StopWatch stopWatch, Function<String, Object> engine, int times) {
         return script -> {
             stopWatch.start(script);
