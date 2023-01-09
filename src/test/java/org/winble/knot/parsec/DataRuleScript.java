@@ -6,6 +6,7 @@ import org.winble.knot.parsec.util.ParserUtils;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Scanner;
 import java.util.function.Predicate;
 
 import static org.winble.knot.parsec.Combinators.defer;
@@ -127,5 +128,21 @@ public class DataRuleScript {
 
     public static boolean eval(String expression) {
         return script.ended().parse(expression).get();
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        while (scanner.hasNext()) {
+            String text = scanner.next();
+            if (":q".equals(text)) {
+                break;
+            }
+            try {
+                System.out.println(eval(text));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        scanner.close();
     }
 }
