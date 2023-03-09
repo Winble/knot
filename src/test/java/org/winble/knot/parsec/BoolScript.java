@@ -13,7 +13,7 @@ import static org.winble.knot.parsec.Parsers.*;
  * Create on 2022/12/29
  * {true | false}
  * S ::= S && S | S || S | (S) | !S | S ? S : S | E
- * S ::= E S' | (S) | !S
+ * S ::= E S' | (S) S' | !S S'
  * S' ::= && S S' | || S S' | ? S : S S' | ε
  * E ::= true | false
  */
@@ -39,7 +39,7 @@ public class BoolScript {
 
     public static final Parser<Boolean> evaluateExpression = or(string("true").as(true), string("false").as(false)).wrap(ignoreSpace);
 
-    public static final Parser<Boolean> script = or(bracketExpression, negateExpression, evaluateExpression.bind(pre -> predicateExpression.map(r -> r.test(pre)))).wrap(ignoreSpace);
+    public static final Parser<Boolean> script = or(bracketExpression, negateExpression, evaluateExpression).bind(pre -> predicateExpression.map(r -> r.test(pre))).wrap(ignoreSpace);
 
     public static boolean eval(String expression) {
         return script.ended().parse(expression).get();

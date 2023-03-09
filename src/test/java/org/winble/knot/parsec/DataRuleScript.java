@@ -19,7 +19,7 @@ import static org.winble.knot.parsec.util.ParserUtils.biInvoke;
  * Create on 2022/12/29
  * {true | false}
  * S ::= S && S | S || S | (S) | !S | S ? S : S | E
- * S ::= E S' | (S) | !S
+ * S ::= E S' | (S) S' | !S S'
  * S' ::= && S S' | || S S' | ? S : S S' | ε
  * E ::= EQUAL | CONTAINS | EMPTY | INSTANCE | true | false
  * EQUAL ::= VALUE == VALUE
@@ -73,7 +73,7 @@ public class DataRuleScript {
 
     public static final Parser<Boolean> evaluateExpression = or(equalExpression, containsExpression, isEmptyExpression, instanceOfExpression, string("true").as(true), string("false").as(false)).wrap(ignoreSpace);
 
-    public static final Parser<Boolean> script = or(bracketExpression, negateExpression, evaluateExpression.bind(pre -> predicateExpression.map(r -> r.test(pre)))).wrap(ignoreSpace);
+    public static final Parser<Boolean> script = or(bracketExpression, negateExpression, evaluateExpression).bind(pre -> predicateExpression.map(r -> r.test(pre))).wrap(ignoreSpace);
 
     private static boolean equalEval(Object l, Object r) {
         if (l == r) {
@@ -133,7 +133,7 @@ public class DataRuleScript {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         while (scanner.hasNext()) {
-            String text = scanner.next();
+            String text = scanner.nextLine();
             if (":q".equals(text)) {
                 break;
             }
